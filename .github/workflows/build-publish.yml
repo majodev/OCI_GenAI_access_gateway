@@ -10,7 +10,7 @@ on:
 env:
   DOCKER_ENV_FILE: ".github/workflows/docker.env"
   REGISTRY: ghcr.io
-  IMAGE_NAME: oci-genai-access-gateway
+  IMAGE_NAME: ${{ toLower(github.repository) }}
 
 jobs:
   build:
