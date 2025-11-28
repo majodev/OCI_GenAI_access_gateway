@@ -46,7 +46,7 @@ Oracle已经发布了SDK，可以方便地调用OCI生成式AI服务。但是对
 
 1. Clone this repository;
 
-2. Finish prerequisites, follow [Set Prerequisites](#set-prerequisites) ；
+2. Finish prerequisites (see [Set Prerequisites](#set-prerequisites))
 
 3. Run this app:
 
@@ -67,40 +67,31 @@ Oracle已经发布了SDK，可以方便地调用OCI生成式AI服务。但是对
 
     ## Option 2: Launch in docker
 
-Environment-driven launch using environment variables (no config.py edits):
-```bash
-docker run --rm -p 8088:8088 \
-  -e AUTH_TYPE=API_KEY \
-  -e DEFAULT_API_KEYS=ocigenerativeai \
-  -e OCI_REGION=us-chicago-1 \
-  -e OCI_COMPARTMENT=ocid1.compartment.oc1..xxxx \
-  -e OCI_CONFIG_FILE=/root/.oci/config \
-  -v ~/.oci:/root/.oci \
-  oci_genai_gateway
-```
-
-To use instance principals (no ~/.oci needed):
-```bash
-docker run --rm -p 8088:8088 \
-  -e AUTH_TYPE=INSTANCE_PRINCIPAL \
-  -e OCI_REGION=us-chicago-1 \
-  -e OCI_COMPARTMENT=ocid1.compartment.oc1..xxxx \
-  oci_genai_gateway
-```
-
-Note:
-- Container bind port can be changed with -e PORT=9090 (Dockerfile binds 0.0.0.0:${PORT:-8088}).
-- You can adjust Gunicorn workers via -e WORKERS (defaults to 8).
-
-    Make sure the `key_file` parameter in user's directory `~/.oci/config` is `~/.oci`, where config and private key located.
+    Prebuilt multi-arch (amd64/arm64) images are [available here](https://github.com/jin38324/OCI_GenAI_access_gateway/pkgs/container/oci_genai_access_gateway): `ghcr.io/jin38324/oci_genai_access_gateway:latest`
 
     ```bash
-    docker build -t oci_genai_gateway .
+    docker pull ghcr.io/jin38324/oci_genai_access_gateway:latest
+    ```
 
-    docker run -p 8088:8088 \
-            -v ~/.oci:/root/.oci \
-            -it oci_genai_gateway
-			-n oci_genai_gateway
+    Environment-driven launch using environment variables:
+    ```bash
+    docker run --rm -p 8088:8088 \
+    -e AUTH_TYPE=API_KEY \
+    -e DEFAULT_API_KEYS=ocigenerativeai \
+    -e OCI_REGION=us-chicago-1 \
+    -e OCI_COMPARTMENT=ocid1.compartment.oc1..xxxx \
+    -e OCI_CONFIG_FILE=/root/.oci/config \
+    -v ~/.oci:/root/.oci \
+    ghcr.io/jin38324/oci_genai_access_gateway:latest
+    ```
+
+    To use instance principals (no ~/.oci needed):
+    ```bash
+    docker run --rm -p 8088:8088 \
+    -e AUTH_TYPE=INSTANCE_PRINCIPAL \
+    -e OCI_REGION=us-chicago-1 \
+    -e OCI_COMPARTMENT=ocid1.compartment.oc1..xxxx \
+    ghcr.io/jin38324/oci_genai_access_gateway:latest
     ```
 
 4. Config your application, set `API Key` and `Host`， like this:
@@ -114,10 +105,12 @@ Note:
     ![alt text](image/chat.png)
 
 
-
-# Set Prerequisites
+# Set Prerequisites (Host only)
 
 ## 1. Install python packages
+
+> If using the [prebuilt Docker image](https://github.com/jin38324/OCI_GenAI_access_gateway/pkgs/container/oci_genai_access_gateway) `ghcr.io/jin38324/oci_genai_access_gateway:latest`, skip this section. The prebuilt image already contains all dependencies.
+
 `pip install -r requirements.txt`
 
 ## 2. Set authentication
