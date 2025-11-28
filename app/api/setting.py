@@ -57,7 +57,6 @@ elif AUTH_TYPE == 'RESOURCE_PRINCIPAL':
     
 CLIENT_KWARGS.update({'config': OCI_CONFIG})
 CLIENT_KWARGS.update({'signer': signer})
-CLIENT_KWARGS.update({'region': config.REGION})
 
 INFERENCE_ENDPOINT_TEMPLATE = "https://inference.generativeai.{region}.oci.oraclecloud.com/20231130"
 
@@ -68,6 +67,7 @@ EMBED_TRUNCATE = os.environ.get("EMBED_TRUNCATE", "END")
 
 OCI_REGION = os.environ.get("OCI_REGION", config.REGION)
 OCI_COMPARTMENT = os.environ.get("OCI_COMPARTMENT", config.OCI_COMPARTMENT)
+CLIENT_KWARGS.update({'region': OCI_REGION})
 
 if OCI_REGION and OCI_COMPARTMENT:
     SUPPORTED_OCIGENAI_EMBEDDING_MODELS = {}

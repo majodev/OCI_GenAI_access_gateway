@@ -67,6 +67,31 @@ Oracle已经发布了SDK，可以方便地调用OCI生成式AI服务。但是对
 
     ## Option 2: Launch in docker
 
+Environment-driven launch using environment variables (no config.py edits):
+```bash
+docker run --rm -p 8088:8088 \
+  -e AUTH_TYPE=API_KEY \
+  -e DEFAULT_API_KEYS=ocigenerativeai \
+  -e OCI_REGION=us-chicago-1 \
+  -e OCI_COMPARTMENT=ocid1.compartment.oc1..xxxx \
+  -e OCI_CONFIG_FILE=/root/.oci/config \
+  -v ~/.oci:/root/.oci \
+  oci_genai_gateway
+```
+
+To use instance principals (no ~/.oci needed):
+```bash
+docker run --rm -p 8088:8088 \
+  -e AUTH_TYPE=INSTANCE_PRINCIPAL \
+  -e OCI_REGION=us-chicago-1 \
+  -e OCI_COMPARTMENT=ocid1.compartment.oc1..xxxx \
+  oci_genai_gateway
+```
+
+Note:
+- Container bind port can be changed with -e PORT=9090 (Dockerfile binds 0.0.0.0:${PORT:-8088}).
+- You can adjust Gunicorn workers via -e WORKERS (defaults to 8).
+
     Make sure the `key_file` parameter in user's directory `~/.oci/config` is `~/.oci`, where config and private key located.
 
     ```bash
@@ -104,7 +129,7 @@ Create access authentication for OCI. There are two ways to achieve this:
 
 create config file on OCI console, follow this [SDK and CLI Configuration File](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/sdkconfig.htm).
 
-Set `config.py` file, point to your config location,like `OCI_CONFIG_FILE = "~/.oci/config"`.
+Prefer environment variable: set OCI_CONFIG_FILE to your config path (e.g., `-e OCI_CONFIG_FILE=/root/.oci/config` in Docker). `config.py` only provides defaults.
 
 **Option2: Use instance principal setting**
 
@@ -114,7 +139,7 @@ allow dynamic-group <xxxx> to manage generative-ai-family in tenancy
 ```
 xxxx is your dynamic-group that indicated your vm or other resources
 
-in `config.py`, set `AUTH_TYPE=INSTANCE_PRINCIPAL`
+Set environment variable `AUTH_TYPE=INSTANCE_PRINCIPAL`
 
 ## Setting models
 
@@ -166,7 +191,7 @@ Model information parameters:
 
 ## Other settings:
 
-These settings has default values, you can modify the `config.py` file to change default settings.
+These settings have defaults in `config.py`, and all can be overridden via environment variables of the same name (recommended, especially in Docker).
 
 | Variable Name         | Description                                                       | Default Value       |
 |-----------------------|-------------------------------------------------------------------|---------------------|
@@ -177,7 +202,7 @@ These settings has default values, you can modify the `config.py` file to change
 | DEBUG                 | if True, more logs will displayed                                 | True                |
 | DEFAULT_API_KEYS      | Authorize token for the API                                       | ocigenerativeai     |
 | API_ROUTE_PREFIX      | API url PREDIX                                                    | "/v1"               |
-| AUTH_TYPE             | `API_KEY` or `INSTANCE_PRINCIPAL`                                 | "API_KEY"            |
+| AUTH_TYPE             | `API_KEY`, `INSTANCE_PRINCIPAL`, or `RESOURCE_PRINCIPAL`          | "API_KEY"            |
 
 # Deployment
 
