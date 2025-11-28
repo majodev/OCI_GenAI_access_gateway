@@ -65,6 +65,10 @@ jobs:
         uses: docker/metadata-action@369eb591f429131d6889c46b94e711f089e6ca96
         with:
           images: ${{ env.REGISTRY }}/${{ steps.image_name.outputs.image }}
+          tags: |
+            type=raw,value=latest,enable={{is_tag}}
+            type=ref,event=tag
+            type=ref,event=branch
 
       - name: Build and push
         uses: docker/build-push-action@v6
